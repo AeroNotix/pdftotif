@@ -19,18 +19,14 @@ class Conversion(object):
                            '-dNOPAUSE',
                            '-dBATCH',
                            '-r300x300',
-                           '-sDEVICE=tiffpack',
-                           '-dJPEGQ=50',
+                           '-sDEVICE=jpeg',
+                           '-dJPEGQ=30',
                            '-sPAPERSIZE=a4',
                            '-sOutputFile=%s %s' % (str(ofname), str(ifname)),
                            ]), shell=True)
 
 
 PDFWrapper = Conversion(r'"C:\Program Files\gs\gs8.53\bin')
-
-PDFWrapper.pdf_to_tif(r'"C:\Documents and Settings\francea\Desktop\IMG.pdf"',
-                      r'"C:\Temp\123.jpg"')
-
 
 
 inputPDFdir = r"C:\Documents and Settings\francea\Desktop"
@@ -52,4 +48,4 @@ dirList = os.listdir(path)
 for i, fname in enumerate(dirList):
 
     PDFWrapper.pdf_to_tif('"' + path + '\\' + fname + '"',
-                          '"' + path + '\\' + fname[:-4] + '.tiff' + '"')
+                          '"' + path + '\\' + fname[:-4] + '.jpg' + '"')
