@@ -23,7 +23,7 @@ class Conversion(object):
                            '-dJPEGQ=50',
                            '-sPAPERSIZE=a4',
                            '-sOutputFile=%s %s' % (str(ofname), str(ifname)),
-                           ]))
+                           ]), shell=True)
 
 
 PDFWrapper = Conversion(r'"C:\Program Files\gs\gs8.53\bin')
