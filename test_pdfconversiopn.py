@@ -18,9 +18,8 @@ class Conversion(object):
                            '-q',
                            '-dNOPAUSE',
                            '-dBATCH',
-                           '-r300x300',
-                           '-sDEVICE=jpeg',
-                           '-dJPEGQ=30',
+                           '-r300',
+                           '-sDEVICE=tiffg4',
                            '-sPAPERSIZE=a4',
                            '-sOutputFile=%s %s' % (str(ofname), str(ifname)),
                            ]), shell=True)
@@ -48,4 +47,4 @@ dirList = os.listdir(path)
 for i, fname in enumerate(dirList):
 
     PDFWrapper.pdf_to_tif('"' + path + '\\' + fname + '"',
-                          '"' + path + '\\' + fname[:-4] + '.jpg' + '"')
+                          '"' + path + '\\' + fname[:-4] + '.tiff' + '"')
