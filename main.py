@@ -4,13 +4,12 @@ Module for converting PDF files to tiff files en masse
 
 """
 
-
 import os
 import sys
-
+import subprocess
 
 from PyQt4 import QtGui, QtCore
-
+from pyPdf import PdfFileWriter, PdfFileReader
 from scanning_tools.main_UI import Ui_MainWindow
 
 class MainWindow(QtGui.QMainWindow):
@@ -36,10 +35,27 @@ class MainWindow(QtGui.QMainWindow):
         pass
 
     def single_output_file(self):
-        pass
+        dir_loc = QtGui.QDir()
 
     def single_locate_file(self):
-        pass
+        filename = QtGui.QFileDialog.getOpenFileName(
+                                        self, 'Open', '' ,('PDF Files (*.pdf)'))
+        self._split_pdf(filename)
+
+
+    def _split_pdf(self, filename):
+
+
+        inputpdf = PdfFileReader(open(filename, 'rb'))
+
+        for i in xrange(inputpdf.numPages):
+
+         output = PdfFileWriter()
+         output.addPage(inputpdf.getPage(i))
+         outputStream = open(r"C:\Documents and Settings\francea\Desktop\outputdir\NEW%s.pdf" % i, "wb")
+         output.write(outputStream)
+         outputStream.close()
+
 
 
 if __name__ == "__main__":
