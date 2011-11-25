@@ -9,9 +9,17 @@ import sys
 import subprocess
 import time
 
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
 from pyPdf import PdfFileWriter, PdfFileReader
 from scanning_tools.main_UI import Ui_MainWindow
+
+def cleanup(deletions):
+
+    """
+    Deletes temporary files
+    """
+    for fname in deletions:
+        os.remove(fname)
 
 class MainWindow(QtGui.QMainWindow):
 
@@ -29,14 +37,24 @@ class MainWindow(QtGui.QMainWindow):
         self.ui.setupUi(self)
         self.gscriptpath = '"' +  os.getcwd() + r'\gs\gs8.53\bin'
 
-
     def dir_locate(self):
+        """
+        Will locate a dir to split all pdfs
+        """
         pass
 
     def dir_output(self):
+        """
+        Will locate an output dir for dir conversion
+        """
         pass
 
     def single_output_file(self):
+
+        """
+        Spawns a find file dialog
+        """
+
         self.dir_dialog = QtGui.QFileDialog(self)
         self.dir_dialog.setFileMode(QtGui.QFileDialog.Directory)
 
@@ -84,13 +102,13 @@ class MainWindow(QtGui.QMainWindow):
                         "\page%s.pdf" % i).replace('/', '\\'))
 
             # create the output PDF file handle
-            outputStream = open(
+            output_stream = open(
                                self.single_output_dir + "\page%s.pdf" % i, "wb")
 
 
             # Write the data to the stream and close
-            output.write(outputStream)
-            outputStream.close()
+            output.write(output_stream)
+            output_stream.close()
 
 
             # Send the newly created PDF to the TIF converter.
@@ -111,26 +129,35 @@ class MainWindow(QtGui.QMainWindow):
         time.sleep(5)  # sleep to let conversion take place
 
         # Deletions list gets sent to the function to clear them.
-        self.cleanup(self.deletions)
+
+        cleanup(self.deletions)
 
     def pdf_to_tif(self, ifname, ofname):
 
+        """
+        Converts PDF pages to tif files,
+
+        Uses ghostscript from the command line
+        """
+
+
         subprocess.Popen(' '.join([
-                           self.gscriptpath + '\gswin32c.exe"',
+                           self.gscriptpath + '\gswin32c.exe"',   #gs exe
                            '-q',
                            '-dNOPAUSE',
                            '-dBATCH',
-                           '-r300',
-                           '-sDEVICE=tiffg4',
-                           '-sPAPERSIZE=a4',
+                           '-r300',       # resolution
+                           '-sDEVICE=tiffg4',  # container type, see gs docs
+                           '-sPAPERSIZE=a4',   # page size
                            '-sOutputFile=%s %s' % (str(ofname), str(ifname)),
-                           ]), shell=True)
+                           ]), shell=True)  # don't spawn cmd window
 
-    def cleanup(self, deletions):
-        for fname in deletions:
-            os.remove(fname)
 
     def convert(self):
+
+        """
+        Sends PDF file to the splitter
+        """
 
         self._split_pdf(self.ui.single_line_in.text())
 

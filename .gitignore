@@ -1,0 +1,6 @@
+*.pyc
+*.pdf
+*.tif
+/gs/
+/dist/
+/build/
