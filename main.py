@@ -7,6 +7,7 @@ Module for converting PDF files to tiff files en masse
 import os
 import sys
 import subprocess
+import time
 
 from PyQt4 import QtGui, QtCore
 from pyPdf import PdfFileWriter, PdfFileReader
@@ -26,6 +27,7 @@ class MainWindow(QtGui.QMainWindow):
         QtGui.QMainWindow.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.gscriptpath = r'"C:\Program Files\gs\gs8.53\bin'
 
 
     def dir_locate(self):
@@ -35,28 +37,102 @@ class MainWindow(QtGui.QMainWindow):
         pass
 
     def single_output_file(self):
-        dir_loc = QtGui.QDir()
+        self.dir_dialog = QtGui.QFileDialog(self)
+        self.dir_dialog.setFileMode(QtGui.QFileDialog.Directory)
+
+        if self.dir_dialog.exec_() == True:
+            for item in self.dir_dialog.selectedFiles():
+                self.single_output_dir = item
+                self.ui.single_line_out.setText(item)
+                break
+
+
 
     def single_locate_file(self):
-        filename = QtGui.QFileDialog.getOpenFileName(
-                                        self, 'Open', '' ,('PDF Files (*.pdf)'))
-        self._split_pdf(filename)
+
+        """
+        creates a dialog to find a single file
+        """
+
+        self.ui.single_line_in.setText(QtGui.QFileDialog.getOpenFileName(
+                                       self, 'Open', '' ,('PDF Files (*.pdf)')))
 
 
     def _split_pdf(self, filename):
 
+        """
+        Takes PDF file, splits it and sends each to the converter
+        """
 
-        inputpdf = PdfFileReader(open(filename, 'rb'))
+        self.deletions = []  # init deletions list
+
+        inputpdf = PdfFileReader(open(filename, 'rb')) # open filename
+                                                       # found in dialog
+
+        # Loop through the PDF creating a output stream
+        # and putting the single page into it.
 
         for i in xrange(inputpdf.numPages):
 
-         output = PdfFileWriter()
-         output.addPage(inputpdf.getPage(i))
-         outputStream = open(r"C:\Documents and Settings\francea\Desktop\outputdir\NEW%s.pdf" % i, "wb")
-         output.write(outputStream)
-         outputStream.close()
+            output = PdfFileWriter()  # output init
+            output.addPage(inputpdf.getPage(i)) # get page index from orignal
 
 
+            # append file name of the pdf to the list, so we can tidy up
+            self.deletions.append(
+                        str(self.single_output_dir +
+                        "\page%s.pdf" % i).replace('/', '\\'))
+
+            # create the output PDF file handle
+            outputStream = open(
+                               self.single_output_dir + "\page%s.pdf" % i, "wb")
+
+
+            # Write the data to the stream and close
+            output.write(outputStream)
+            outputStream.close()
+
+
+            # Send the newly created PDF to the TIF converter.
+            # Concatenates file names surrounding in quotes for CLI
+            # interface to the converter.
+            # Take time to expand this so you can see the filenames form.
+            self.pdf_to_tif(
+                        '"'  + str(
+                        self.single_output_dir +
+                        "\\page%s.pdf" % i +
+                        '"' ).replace('/', '\\'),
+
+                        str('"' +
+                        self.single_output_dir +
+                        "\\page%s.tif" % i +
+                        '"').replace('/', '\\'))
+
+        time.sleep(5)  # sleep to let conversion take place
+
+        # Deletions list gets sent to the function to clear them.
+        self.cleanup(self.deletions)
+
+    def pdf_to_tif(self, ifname, ofname):
+
+        subprocess.Popen(' '.join([
+                           self.gscriptpath + '\gswin32c.exe"',
+                           '-q',
+                           '-dNOPAUSE',
+                           '-dBATCH',
+                           '-r300',
+                           '-sDEVICE=tiffg4',
+                           '-sPAPERSIZE=a4',
+                           '-sOutputFile=%s %s' % (str(ofname), str(ifname)),
+                           ]), shell=True)
+
+    def cleanup(self, deletions):
+        for fname in deletions:
+            os.remove(fname)
+
+    def convert(self):
+
+        self._split_pdf(self.ui.single_line_in.text())
 
 if __name__ == "__main__":
     APPLICATION = QtGui.QApplication(sys.argv)

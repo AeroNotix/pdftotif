@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>438</width>
-    <height>232</height>
+    <width>362</width>
+    <height>198</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -36,7 +36,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QLineEdit" name="lineEdit_3"/>
+         <widget class="QLineEdit" name="single_line_in"/>
         </item>
         <item row="0" column="2">
          <widget class="QToolButton" name="btn_single_file">
@@ -45,9 +45,6 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="lineEdit_4"/>
-        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_3">
           <property name="text">
@@ -55,10 +52,20 @@
           </property>
          </widget>
         </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="single_line_out"/>
+        </item>
         <item row="1" column="2">
          <widget class="QToolButton" name="bt_output_single">
           <property name="text">
            <string>...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QPushButton" name="pushButton">
+          <property name="text">
+           <string>Convert</string>
           </property>
          </widget>
         </item>
@@ -117,7 +124,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>438</width>
+     <width>362</width>
      <height>20</height>
     </rect>
    </property>
@@ -149,12 +156,12 @@
    <slot>single_locate_file()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>403</x>
-     <y>98</y>
+     <x>289</x>
+     <y>83</y>
     </hint>
     <hint type="destinationlabel">
-     <x>662</x>
-     <y>569</y>
+     <x>361</x>
+     <y>197</y>
     </hint>
    </hints>
   </connection>
@@ -165,12 +172,12 @@
    <slot>single_output_file()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>402</x>
-     <y>150</y>
+     <x>289</x>
+     <y>114</y>
     </hint>
     <hint type="destinationlabel">
-     <x>695</x>
-     <y>579</y>
+     <x>361</x>
+     <y>197</y>
     </hint>
    </hints>
   </connection>
@@ -181,12 +188,12 @@
    <slot>dir_locate()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>408</x>
-     <y>99</y>
+     <x>339</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
-     <x>724</x>
-     <y>561</y>
+     <x>361</x>
+     <y>197</y>
     </hint>
    </hints>
   </connection>
@@ -197,12 +204,28 @@
    <slot>dir_output()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>397</x>
-     <y>156</y>
+     <x>339</x>
+     <y>138</y>
     </hint>
     <hint type="destinationlabel">
-     <x>686</x>
-     <y>604</y>
+     <x>361</x>
+     <y>197</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>convert()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>306</x>
+     <y>136</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>506</y>
     </hint>
    </hints>
   </connection>
@@ -212,5 +235,6 @@
   <slot>single_output_file()</slot>
   <slot>dir_locate()</slot>
   <slot>dir_output()</slot>
+  <slot>convert()</slot>
  </slots>
 </ui>
