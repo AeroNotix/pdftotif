@@ -27,7 +27,7 @@ class MainWindow(QtGui.QMainWindow):
         QtGui.QMainWindow.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.gscriptpath = r'"C:\Program Files\gs\gs8.53\bin'
+        self.gscriptpath = '"' +  os.getcwd() + r'\gs\gs8.53\bin'
 
 
     def dir_locate(self):
