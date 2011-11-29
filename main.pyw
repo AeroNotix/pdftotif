@@ -8,6 +8,7 @@ import os
 import sys
 import subprocess
 import time
+import random
 
 from PyQt4 import QtGui
 from pyPdf import PdfFileWriter, PdfFileReader
@@ -35,7 +36,7 @@ class MainWindow(QtGui.QMainWindow):
         QtGui.QMainWindow.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.gscriptpath = '"' +  os.getcwd() + r'\gs\gs8.53\bin'
+        self.gscriptpath = '"' +  os.getcwd() + r'\gs\gs9.02\bin'
 
     def dir_locate(self):
         """
@@ -91,6 +92,7 @@ class MainWindow(QtGui.QMainWindow):
         # and putting the single page into it.
 
         for i in xrange(inputpdf.numPages):
+            print inputpdf.numPages
 
             output = PdfFileWriter()  # output init
             output.addPage(inputpdf.getPage(i)) # get page index from orignal
@@ -139,6 +141,8 @@ class MainWindow(QtGui.QMainWindow):
 
         Uses ghostscript from the command line
         """
+
+
 
 
         subprocess.Popen(' '.join([
