@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>362</width>
-    <height>198</height>
+    <height>203</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -117,6 +117,13 @@
       </widget>
      </widget>
     </item>
+    <item row="1" column="0">
+     <widget class="QProgressBar" name="progressBar">
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -157,7 +164,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>289</x>
-     <y>83</y>
+     <y>78</y>
     </hint>
     <hint type="destinationlabel">
      <x>361</x>
@@ -173,7 +180,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>289</x>
-     <y>114</y>
+     <y>104</y>
     </hint>
     <hint type="destinationlabel">
      <x>361</x>
@@ -189,7 +196,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>339</x>
-     <y>95</y>
+     <y>88</y>
     </hint>
     <hint type="destinationlabel">
      <x>361</x>
@@ -205,7 +212,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>339</x>
-     <y>138</y>
+     <y>124</y>
     </hint>
     <hint type="destinationlabel">
      <x>361</x>
@@ -220,12 +227,12 @@
    <slot>convert()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>306</x>
-     <y>136</y>
+     <x>339</x>
+     <y>134</y>
     </hint>
     <hint type="destinationlabel">
-     <x>600</x>
-     <y>506</y>
+     <x>361</x>
+     <y>202</y>
     </hint>
    </hints>
   </connection>
