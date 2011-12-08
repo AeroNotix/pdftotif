@@ -4,15 +4,17 @@ Module for converting PDF files to tiff files en masse
 
 """
 
+
+#---------------------------Imports---------------------------------------------
 import os
 import sys
 import subprocess
-#import time
-import threading
-from Queue import Queue
+import time
+#import threading
+#from Queue import Queue
 
 from PyQt4 import QtGui
-#import Image, ImageFilter, ImageEnhance
+from PyQt4.QtCore import QThread, SIGNAL
 
 from pyPdf import PdfFileWriter, PdfFileReader
 from scanning_tools.main_UI import Ui_MainWindow
@@ -36,6 +38,9 @@ class MainWindow(QtGui.QMainWindow):
         self.gscriptpath = '"' +  os.getcwd() + r'\gs\gs9.02\bin'
         self.gui.progressBar.hide()
         self.single_output_dir = ''
+        self.threads = []
+        self.deletions = []
+        self.thread_handler = ThreadHandler()
 
     def dir_locate(self):
         """
@@ -76,99 +81,83 @@ class MainWindow(QtGui.QMainWindow):
                                        self, 'Open', '' ,('PDF Files (*.pdf)')))
 
 
+    def update_progress_bar(self):
+
+        """
+        Method to update progress bar whilst running conversion
+        """
+
+        self.gui.progressBar.setValue(self.gui.progressBar.value()+1)
+
+        if self.gui.progressBar.value() == self.gui.progressBar.maximum():
+            self.gui.progressBar.hide()
+            self.file_cleaner = FileCleaner(self.deletions)
+            self.file_cleaner.start()
+
+
     def convert(self):
 
         """
         Implementation of multithreaded processing
         """
-        def producer(queue, pdf):
 
-            """
-            Produces jobs for the consumer to monitor
-            """
+        pdf = PdfFileReader(open(self.gui.single_line_in.text(), 'rb'))
 
-            deletions = []
-            # Loop through the PDF creating a output stream
-            # and putting the single page into it.
-            for i in xrange(pdf.numPages):
+        self.gui.progressBar.show()
+        self.gui.progressBar.setMaximum(pdf.numPages)
 
-                output = PdfFileWriter()  # output init
-                output.addPage(pdf.getPage(i)) # get page index from orignal
+        # Loop through the PDF creating a output stream
+        # and putting the single page into it.
 
+        for i in xrange(pdf.numPages):
 
-                # append file name of the pdf to the list, so we can tidy up
-                deletions.append(
-                            str(self.single_output_dir +
-                            "\page%s.pdf" % i).replace('/', '\\'))
-
-                # create the output PDF file handle
-                output_stream = open(
-                               self.single_output_dir + "\page%s.pdf" % i, "wb")
+            output = PdfFileWriter()  # output init
+            output.addPage(pdf.getPage(i)) # get page index from orignal
 
 
-                # Write the data to the stream and close
-                output.write(output_stream)
-                output_stream.close()
+            # append file name of the pdf to the list, so we can tidy up
+            self.deletions.append(
+                        str(self.single_output_dir +
+                        "\page%s.pdf" % i).replace('/', '\\'))
+
+            # create the output PDF file handle
+            output_stream = open(
+                           self.single_output_dir + "\page%s.pdf" % i, "wb")
 
 
-                # Send the newly created PDF to the TIF converter.
-                # Concatenates file names surrounding in quotes for CLI
-                # interface to the converter.
-                # Take time to expand this so you can see the filenames form.
-
-                thread = PDFConverter(
-                            '"'  + str(
-                            self.single_output_dir +
-                            "\\page%s.pdf" % i +
-                            '"' ).replace('/', '\\'),     # WTF IS THIS SHIT
-
-                            str('"' +
-                            self.single_output_dir +
-                            "\\page%s.tif" % i +
-                            '"').replace('/', '\\'))      # WTF IS THIS SHIT
-
-                thread.start()
-                queue.put(thread, True)
+            # Write the data to the stream and close
+            output.write(output_stream)
+            output_stream.close()
 
 
-        def consumer(queue, total_files):
+            # Send the newly created PDF to the TIF converter.
+            # Concatenates file names surrounding in quotes for CLI
+            # interface to the converter.
+            # Take time to expand this so you can see the filenames form.
 
-            """
-            Receives jobs and blocks whilst they complete
-            """
+            self.threads.append(QPDFConverter(
+                        '"'  + str(
+                        self.single_output_dir +
+                        "\\page%s.pdf" % i +
+                        '"' ).replace('/', '\\'),     # WTF IS THIS SHIT
 
-            finished = 0 # task counter
+                        str('"' +
+                        self.single_output_dir +
+                        "\\page%s.tif" % i +
+                        '"').replace('/', '\\')))     # WTF IS THIS SHIT
 
-            while finished < total_files:
-
-                # get tasks
-                thread = queue.get(True)
-
-                # block whilst running
-                thread.join()
-                finished += 1
-
-
-        # Queue size, we can play with this.
-        queue = Queue(30)
-
-        # open pdf and assign local var
-        pdffname = PdfFileReader(open(self.gui.single_line_in.text(), 'rb'))
-
-        # init threads
-        prod_thread = threading.Thread(target=producer,
-                                       args=(queue, pdffname))
+##        for _thread in self.threads:
+##            self.connect(_thread, SIGNAL("finished(bool)"),
+##                         self.update_progress_bar)
+##            _thread.start()
 
 
-        cons_thread = threading.Thread(target=consumer,
-                                       args=(queue, pdffname.numPages))
+        # Loop through QPDFConverter instances and add them to thread queue
+        for _thread in self.threads:
+            self.thread_handler.add_thread(_thread, self)
 
-        prod_thread.start()    # Start them engines!
-        cons_thread.start()
-        prod_thread.join()     # Ensure block!
-        cons_thread.join()
-
-        #cleanup(deletions)
+        # Once all are added, start queue
+        self.thread_handler.start()
 
 
 
@@ -190,20 +179,35 @@ def encase(string, target):
 
 #-------------------------------Multithreading----------------------------------
 
-
-class PDFConverter(threading.Thread):
+class QPDFConverter(QThread):
 
     """
-    Multithreading offloader for converter
+    Class for handling conversion of PDF files in separate threads
     """
 
-    def __init__(self, ifname, ofname):
-        self.ifname = ifname
+    def __init__(self, ifname, ofname, parent=None):
+
+        """
+        Create instance for conversion
+        """
+
+        super(QPDFConverter, self).__init__(parent)
         self.ofname = ofname
+        self.ifname = ifname
         self.gscriptpath = '"' +  os.getcwd() + r'\gs\gs9.02\bin'
-        threading.Thread.__init__(self)
+        self.completed = False
+
 
     def run(self):
+
+        """
+        Tasks to put in separate thread.
+        """
+
+        self.process_file()
+        self.emit(SIGNAL("finished(bool)"), self.completed)
+
+    def process_file(self):
 
         """
         Converts PDF pages to tif files,
@@ -211,21 +215,115 @@ class PDFConverter(threading.Thread):
         Uses ghostscript from the command line
         """
 
-        subprocess.Popen(' '.join([
+        subprocess.call(' '.join([
                            self.gscriptpath + '\gswin32c.exe"',   #gs exe
                            '-q',
                            '-dNOPAUSE',
                            '-dBATCH',
-                           '-r900',       # resolution
+                           '-r900',            # resolution
                            '-sDEVICE=tiffg4',  # container type, see gs docs
                            '-sPAPERSIZE=a4',   # page size
                            '-sOutputFile=%s %s' % (str(self.ofname),
                                                    str(self.ifname))
+                           ]), shell=False)  # don't spawn cmd window
 
-                           ]), shell=True)  # don't spawn cmd window
+        self.completed = True
 
-        #cmd.wait()
 
+
+class FileCleaner(QThread):
+
+    """
+    Cleans temp files
+    """
+
+    def __init__(self, deletions, parent=None):
+
+        """
+        Create instance of FileCleaner with new list
+        """
+
+        super(FileCleaner, self).__init__(parent)
+        self.deletions = deletions
+
+    def run(self):
+
+        """
+        Tasks to complete in a separate thread
+        """
+
+        time.sleep(5)
+        for fname in self.deletions:
+            os.remove(fname)
+
+class ThreadHandler(QThread):
+
+    """
+    Supposed to be handling starting and stopping of threads
+    """
+
+    def __init__(self, parent=None):
+        super(ThreadHandler, self).__init__(parent)
+        self.new_threads = []
+        self.active_threads = []
+        self.running = False
+
+    def add_thread(self, thread, cls):
+
+        """
+        Add a new thread to the unactive queue
+        """
+
+        self.connect(thread, SIGNAL("finished(bool)"),
+                     cls.update_progress_bar)
+        self.new_threads.append(thread)
+
+    def run(self):
+
+        """
+        Method to execute magic in separate threads
+        """
+
+        if not self.running:   # if we get called whilst we're running, no go!
+            self.running = True    # We've started
+
+            while self.running:
+                try:
+                    for i in range(len(self.new_threads)): # count threads and
+                                                           # go for that long
+
+                        # append a thread to the active list
+                        self.active_threads.append(self.new_threads[i])
+
+                        # start said thread
+                        self.active_threads[i].start()
+
+                    # wait until all threads in queue have finished.
+                    while not self.threadcheck(i):
+                        pass
+
+                # if we go too far, we've ended the queue
+                finally:
+                    self.running = False
+
+    def threadcheck(self, index):
+
+        """
+        Queries threads to see if they're active
+        if all have ended, return true. Else false
+        """
+
+        # loop through active threads
+        for _thread in self.active_threads:
+
+            # check if threads in queue have finished
+            if not _thread.isFinished():
+                return False
+
+        # if the current index is at the end, we can stop adding threads
+        if index == len(self.active_threads):
+            self.running = False
+        return True
 
 
 if __name__ == "__main__":
