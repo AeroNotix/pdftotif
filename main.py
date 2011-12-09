@@ -1,6 +1,11 @@
 """
 
-Module for converting PDF files to tiff files en masse
+Main Module for converting PDF files to tiff files en masse
+
+Consider breaking out into different modules, all this one really needs to do
+is construct the GUI class. Everything can be imported to save on readability
+and code portability. Multithreading in particular has a class that could
+be beneficial elsewhere.
 
 """
 
@@ -8,16 +13,16 @@ Module for converting PDF files to tiff files en masse
 #---------------------------Imports---------------------------------------------
 import os
 import sys
-import subprocess
-import time
-#import threading
-#from Queue import Queue
 
 from PyQt4 import QtGui
-from PyQt4.QtCore import QThread, SIGNAL
 
 from pyPdf import PdfFileWriter, PdfFileReader
-from scanning_tools.main_UI import Ui_MainWindow
+from scanning_qthread.ui.main_UI import Ui_MainWindow
+from scanning_qthread.mthreading.mthreading import (QPDFConverter,
+                                                   ThreadHandler,
+                                                   FileCleaner)
+
+from scanning_qthread.misc.misc import encase, cleanup
 
 #---------------------------GUI Class-------------------------------------------
 
@@ -91,16 +96,17 @@ class MainWindow(QtGui.QMainWindow):
 
         if self.gui.progressBar.value() == self.gui.progressBar.maximum():
             self.gui.progressBar.hide()
-            self.file_cleaner = FileCleaner(self.deletions)
+            self.file_cleaner = FileCleaner(self.deletions, self)
             self.file_cleaner.start()
-
+            self.thread_handler.cleanup()
+            self.thread_handler.exit()
 
     def convert(self):
 
         """
         Implementation of multithreaded processing
         """
-
+        self.gui.pushButton.setEnabled(False)
         pdf = PdfFileReader(open(self.gui.single_line_in.text(), 'rb'))
 
         self.gui.progressBar.show()
@@ -146,11 +152,6 @@ class MainWindow(QtGui.QMainWindow):
                         "\\page%s.tif" % i +
                         '"').replace('/', '\\')))     # WTF IS THIS SHIT
 
-##        for _thread in self.threads:
-##            self.connect(_thread, SIGNAL("finished(bool)"),
-##                         self.update_progress_bar)
-##            _thread.start()
-
 
         # Loop through QPDFConverter instances and add them to thread queue
         for _thread in self.threads:
@@ -160,170 +161,6 @@ class MainWindow(QtGui.QMainWindow):
         self.thread_handler.start()
 
 
-
-#-------------------------------Helper Functions--------------------------------
-
-def cleanup(deletions):
-
-    """
-    Deletes temporary files
-    """
-    for fname in deletions:
-        os.remove(fname)
-
-def encase(string, target):
-    """
-    Encases a string in another string
-    """
-    return string+target+string
-
-#-------------------------------Multithreading----------------------------------
-
-class QPDFConverter(QThread):
-
-    """
-    Class for handling conversion of PDF files in separate threads
-    """
-
-    def __init__(self, ifname, ofname, parent=None):
-
-        """
-        Create instance for conversion
-        """
-
-        super(QPDFConverter, self).__init__(parent)
-        self.ofname = ofname
-        self.ifname = ifname
-        self.gscriptpath = '"' +  os.getcwd() + r'\gs\gs9.02\bin'
-        self.completed = False
-
-
-    def run(self):
-
-        """
-        Tasks to put in separate thread.
-        """
-
-        self.process_file()
-        self.emit(SIGNAL("finished(bool)"), self.completed)
-
-    def process_file(self):
-
-        """
-        Converts PDF pages to tif files,
-
-        Uses ghostscript from the command line
-        """
-
-        subprocess.call(' '.join([
-                           self.gscriptpath + '\gswin32c.exe"',   #gs exe
-                           '-q',
-                           '-dNOPAUSE',
-                           '-dBATCH',
-                           '-r900',            # resolution
-                           '-sDEVICE=tiffg4',  # container type, see gs docs
-                           '-sPAPERSIZE=a4',   # page size
-                           '-sOutputFile=%s %s' % (str(self.ofname),
-                                                   str(self.ifname))
-                           ]), shell=False)  # don't spawn cmd window
-
-        self.completed = True
-
-
-
-class FileCleaner(QThread):
-
-    """
-    Cleans temp files
-    """
-
-    def __init__(self, deletions, parent=None):
-
-        """
-        Create instance of FileCleaner with new list
-        """
-
-        super(FileCleaner, self).__init__(parent)
-        self.deletions = deletions
-
-    def run(self):
-
-        """
-        Tasks to complete in a separate thread
-        """
-
-        time.sleep(5)
-        for fname in self.deletions:
-            os.remove(fname)
-
-class ThreadHandler(QThread):
-
-    """
-    Supposed to be handling starting and stopping of threads
-    """
-
-    def __init__(self, parent=None):
-        super(ThreadHandler, self).__init__(parent)
-        self.new_threads = []
-        self.active_threads = []
-        self.running = False
-
-    def add_thread(self, thread, cls):
-
-        """
-        Add a new thread to the unactive queue
-        """
-
-        self.connect(thread, SIGNAL("finished(bool)"),
-                     cls.update_progress_bar)
-        self.new_threads.append(thread)
-
-    def run(self):
-
-        """
-        Method to execute magic in separate threads
-        """
-
-        if not self.running:   # if we get called whilst we're running, no go!
-            self.running = True    # We've started
-
-            while self.running:
-                try:
-                    for i in range(len(self.new_threads)): # count threads and
-                                                           # go for that long
-
-                        # append a thread to the active list
-                        self.active_threads.append(self.new_threads[i])
-
-                        # start said thread
-                        self.active_threads[i].start()
-
-                    # wait until all threads in queue have finished.
-                    while not self.threadcheck(i):
-                        pass
-
-                # if we go too far, we've ended the queue
-                finally:
-                    self.running = False
-
-    def threadcheck(self, index):
-
-        """
-        Queries threads to see if they're active
-        if all have ended, return true. Else false
-        """
-
-        # loop through active threads
-        for _thread in self.active_threads:
-
-            # check if threads in queue have finished
-            if not _thread.isFinished():
-                return False
-
-        # if the current index is at the end, we can stop adding threads
-        if index == len(self.active_threads):
-            self.running = False
-        return True
 
 
 if __name__ == "__main__":
