@@ -15,6 +15,7 @@ import os
 import sys
 
 from PyQt4 import QtGui
+from PyQt4.QtCore import SIGNAL
 
 from pyPdf import PdfFileWriter, PdfFileReader
 from scanning_qthread.ui.main_UI import Ui_MainWindow
@@ -46,6 +47,9 @@ class MainWindow(QtGui.QMainWindow):
         self.threads = []
         self.deletions = []
         self.thread_handler = ThreadHandler()
+
+    def quit(self):
+        print 'quitted'
 
     def dir_locate(self):
         """
@@ -159,6 +163,9 @@ class MainWindow(QtGui.QMainWindow):
 
         # Once all are added, start queue
         self.thread_handler.start()
+
+    def convert_dir(self):
+        pass
 
 
 

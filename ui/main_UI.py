@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Wed Dec 07 11:17:01 2011
+# Created: Fri Dec 09 15:25:53 2011
 #      by: PyQt4 UI code generator 4.8.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -46,9 +46,9 @@ class Ui_MainWindow(object):
         self.bt_output_single = QtGui.QToolButton(self.tab)
         self.bt_output_single.setObjectName(_fromUtf8("bt_output_single"))
         self.gridLayout_4.addWidget(self.bt_output_single, 1, 2, 1, 1)
-        self.pushButton = QtGui.QPushButton(self.tab)
-        self.pushButton.setObjectName(_fromUtf8("pushButton"))
-        self.gridLayout_4.addWidget(self.pushButton, 2, 2, 1, 1)
+        self.btn_single_convert = QtGui.QPushButton(self.tab)
+        self.btn_single_convert.setObjectName(_fromUtf8("btn_single_convert"))
+        self.gridLayout_4.addWidget(self.btn_single_convert, 2, 2, 1, 1)
         self.tabWidget.addTab(self.tab, _fromUtf8(""))
         self.tab_2 = QtGui.QWidget()
         self.tab_2.setObjectName(_fromUtf8("tab_2"))
@@ -62,7 +62,7 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.lineEdit, 0, 1, 1, 1)
         self.btn_dir_lookup = QtGui.QToolButton(self.tab_2)
         self.btn_dir_lookup.setObjectName(_fromUtf8("btn_dir_lookup"))
-        self.gridLayout_2.addWidget(self.btn_dir_lookup, 0, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.btn_dir_lookup, 0, 3, 1, 1)
         self.label_2 = QtGui.QLabel(self.tab_2)
         self.label_2.setObjectName(_fromUtf8("label_2"))
         self.gridLayout_2.addWidget(self.label_2, 1, 0, 1, 1)
@@ -71,7 +71,10 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.lineEdit_2, 1, 1, 1, 1)
         self.btn_output_dir = QtGui.QToolButton(self.tab_2)
         self.btn_output_dir.setObjectName(_fromUtf8("btn_output_dir"))
-        self.gridLayout_2.addWidget(self.btn_output_dir, 1, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.btn_output_dir, 1, 3, 1, 1)
+        self.btn_dir_convert = QtGui.QPushButton(self.tab_2)
+        self.btn_dir_convert.setObjectName(_fromUtf8("btn_dir_convert"))
+        self.gridLayout_2.addWidget(self.btn_dir_convert, 2, 3, 1, 1)
         self.tabWidget.addTab(self.tab_2, _fromUtf8(""))
         self.gridLayout.addWidget(self.tabWidget, 0, 0, 1, 1)
         self.progressBar = QtGui.QProgressBar(self.centralwidget)
@@ -101,7 +104,9 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.bt_output_single, QtCore.SIGNAL(_fromUtf8("clicked()")), MainWindow.single_output_file)
         QtCore.QObject.connect(self.btn_dir_lookup, QtCore.SIGNAL(_fromUtf8("clicked()")), MainWindow.dir_locate)
         QtCore.QObject.connect(self.btn_output_dir, QtCore.SIGNAL(_fromUtf8("clicked()")), MainWindow.dir_output)
-        QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL(_fromUtf8("clicked()")), MainWindow.convert)
+        QtCore.QObject.connect(self.btn_single_convert, QtCore.SIGNAL(_fromUtf8("clicked()")), MainWindow.convert)
+        QtCore.QObject.connect(self.btn_dir_convert, QtCore.SIGNAL(_fromUtf8("clicked()")), MainWindow.convert_dir)
+        QtCore.QObject.connect(self.actionQuit, QtCore.SIGNAL(_fromUtf8("triggered()")), MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.lineEdit, self.btn_dir_lookup)
 
@@ -111,12 +116,13 @@ class Ui_MainWindow(object):
         self.btn_single_file.setText(QtGui.QApplication.translate("MainWindow", "...", None, QtGui.QApplication.UnicodeUTF8))
         self.label_3.setText(QtGui.QApplication.translate("MainWindow", "Output Directory", None, QtGui.QApplication.UnicodeUTF8))
         self.bt_output_single.setText(QtGui.QApplication.translate("MainWindow", "...", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton.setText(QtGui.QApplication.translate("MainWindow", "Convert", None, QtGui.QApplication.UnicodeUTF8))
+        self.btn_single_convert.setText(QtGui.QApplication.translate("MainWindow", "Convert", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtGui.QApplication.translate("MainWindow", "Single PDF Conversion", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("MainWindow", "Directory", None, QtGui.QApplication.UnicodeUTF8))
         self.btn_dir_lookup.setText(QtGui.QApplication.translate("MainWindow", "...", None, QtGui.QApplication.UnicodeUTF8))
         self.label_2.setText(QtGui.QApplication.translate("MainWindow", "Output Directory", None, QtGui.QApplication.UnicodeUTF8))
         self.btn_output_dir.setText(QtGui.QApplication.translate("MainWindow", "...", None, QtGui.QApplication.UnicodeUTF8))
+        self.btn_dir_convert.setText(QtGui.QApplication.translate("MainWindow", "Convert", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QtGui.QApplication.translate("MainWindow", "Directory Conversion", None, QtGui.QApplication.UnicodeUTF8))
         self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "File", None, QtGui.QApplication.UnicodeUTF8))
         self.actionQuit.setText(QtGui.QApplication.translate("MainWindow", "Quit..", None, QtGui.QApplication.UnicodeUTF8))
