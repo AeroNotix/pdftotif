@@ -16,7 +16,7 @@ import sys
 import time
 
 from PyQt4 import QtGui
-from PyQt4.QtCore import SIGNAL, QThreadPool
+from PyQt4.QtCore import SIGNAL, QThreadPool, QReadWriteLock
 
 from pyPdf import PdfFileReader
 
@@ -50,6 +50,7 @@ class MainWindow(QtGui.QMainWindow):
         self.single_output_dir = ''
         self.threads = []
         self.deletions = []
+        self.lock = QReadWriteLock()
 
     def quit(self):
         print 'quitted'
@@ -99,16 +100,23 @@ class MainWindow(QtGui.QMainWindow):
         Method to update progress bar whilst running conversion
         """
 
-        self.gui.progressBar.setValue(self.gui.progressBar.value()+1)
-
+        self.lock.lockForRead()
+        curr_progress = self.gui.progressBar.value() + 1
         print self.gui.progressBar.value()
+        self.lock.unlock()
 
-        if self.gui.progressBar.value() % 5 == 0:
-            APPLICATION.processEvents()
+        self.lock.lockForWrite()
+        self.gui.progressBar.setValue(curr_progress)
+        self.lock.unlock()
+
+        APPLICATION.processEvents()
+
+
 
         if self.gui.progressBar.value() == self.gui.progressBar.maximum():
             self.gui.progressBar.hide()
             deleter = QFileWorker(self.deletions, self)
+            deleter.threadpool.waitForDone()
             self.deletions = []
 
 
@@ -117,22 +125,22 @@ class MainWindow(QtGui.QMainWindow):
         """
         Implementation of multithreaded processing
         """
-        self.gui.btn_dir_convert.setEnabled(False)
+        self.gui.btn_dir_convert.setEnabled(False) # disable button
+        self.gui.progressBar.setValue(0) # re-init progress bar
         pdf = PdfFileReader(open(self.gui.single_line_in.text(), 'rb'))
 
         self.gui.progressBar.show()
         self.gui.progressBar.setMaximum(pdf.numPages)
+
         APPLICATION.processEvents()
 
-        # Loop through the PDF creating a output stream
-        # and putting the single page into it.
+        start = time.clock() # debug
 
-
-        start = time.clock()
         work = QThreadPool()
         work.setMaxThreadCount(1)
         work.start(QThreadHandle(pdf, self))
-        print time.clock() - start
+
+        print time.clock() - start # debug
 
     def convert_dir(self):
         pass

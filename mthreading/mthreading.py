@@ -136,6 +136,8 @@ class QWorker(QObject):
         self.connect(runner.q_object, SIGNAL(
                                          "finished()"), cls.update_progress_bar)
         self.threadpool.start(runner)
+        #self.threadpool.waitForDone()
+
 
 
 class QThreadHandle(QRunnable):
@@ -186,5 +188,8 @@ class QThreadHandle(QRunnable):
                         self.cls.single_output_dir +
                         "\\page%s.tif" % i +
                         '"').replace('/', '\\'), self.cls)   # WTF IS THIS SHIT
+
+            #self.work.threadpool.waitForDone()
+
 
 
