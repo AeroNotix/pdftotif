@@ -13,15 +13,19 @@ be beneficial elsewhere.
 #---------------------------Imports---------------------------------------------
 import os
 import sys
+import time
 
 from PyQt4 import QtGui
-from PyQt4.QtCore import SIGNAL
+from PyQt4.QtCore import SIGNAL, QThreadPool
 
-from pyPdf import PdfFileWriter, PdfFileReader
+from pyPdf import PdfFileReader
+
 from scanning_qthread.ui.main_UI import Ui_MainWindow
-from scanning_qthread.mthreading.mthreading import (QPDFConverter,
-                                                   ThreadHandler,
-                                                   FileCleaner)
+from scanning_qthread.mthreading.mthreading import (QRunner,
+                                                   QWorker,
+                                                   QFileCleaner,
+                                                   QFileWorker,
+                                                   QThreadHandle)
 
 from scanning_qthread.misc.misc import encase, cleanup
 
@@ -46,7 +50,6 @@ class MainWindow(QtGui.QMainWindow):
         self.single_output_dir = ''
         self.threads = []
         self.deletions = []
-        self.thread_handler = ThreadHandler()
 
     def quit(self):
         print 'quitted'
@@ -98,71 +101,38 @@ class MainWindow(QtGui.QMainWindow):
 
         self.gui.progressBar.setValue(self.gui.progressBar.value()+1)
 
+        print self.gui.progressBar.value()
+
+        if self.gui.progressBar.value() % 5 == 0:
+            APPLICATION.processEvents()
+
         if self.gui.progressBar.value() == self.gui.progressBar.maximum():
             self.gui.progressBar.hide()
-            self.file_cleaner = FileCleaner(self.deletions, self)
-            self.file_cleaner.start()
-            self.thread_handler.cleanup()
-            self.thread_handler.exit()
+            deleter = QFileWorker(self.deletions, self)
+            self.deletions = []
+
 
     def convert(self):
 
         """
         Implementation of multithreaded processing
         """
-        self.gui.pushButton.setEnabled(False)
+        self.gui.btn_dir_convert.setEnabled(False)
         pdf = PdfFileReader(open(self.gui.single_line_in.text(), 'rb'))
 
         self.gui.progressBar.show()
         self.gui.progressBar.setMaximum(pdf.numPages)
+        APPLICATION.processEvents()
 
         # Loop through the PDF creating a output stream
         # and putting the single page into it.
 
-        for i in xrange(pdf.numPages):
 
-            output = PdfFileWriter()  # output init
-            output.addPage(pdf.getPage(i)) # get page index from orignal
-
-
-            # append file name of the pdf to the list, so we can tidy up
-            self.deletions.append(
-                        str(self.single_output_dir +
-                        "\page%s.pdf" % i).replace('/', '\\'))
-
-            # create the output PDF file handle
-            output_stream = open(
-                           self.single_output_dir + "\page%s.pdf" % i, "wb")
-
-
-            # Write the data to the stream and close
-            output.write(output_stream)
-            output_stream.close()
-
-
-            # Send the newly created PDF to the TIF converter.
-            # Concatenates file names surrounding in quotes for CLI
-            # interface to the converter.
-            # Take time to expand this so you can see the filenames form.
-
-            self.threads.append(QPDFConverter(
-                        '"'  + str(
-                        self.single_output_dir +
-                        "\\page%s.pdf" % i +
-                        '"' ).replace('/', '\\'),     # WTF IS THIS SHIT
-
-                        str('"' +
-                        self.single_output_dir +
-                        "\\page%s.tif" % i +
-                        '"').replace('/', '\\')))     # WTF IS THIS SHIT
-
-
-        # Loop through QPDFConverter instances and add them to thread queue
-        for _thread in self.threads:
-            self.thread_handler.add_thread(_thread, self)
-
-        # Once all are added, start queue
-        self.thread_handler.start()
+        start = time.clock()
+        work = QThreadPool()
+        work.setMaxThreadCount(1)
+        work.start(QThreadHandle(pdf, self))
+        print time.clock() - start
 
     def convert_dir(self):
         pass

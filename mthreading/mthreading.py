@@ -8,27 +8,80 @@ Beyond here, be dragons. Arm yourself.
 import os
 import time
 
-from PyQt4.QtCore import QThread, SIGNAL, QProcess
+from pyPdf import PdfFileWriter, PdfFileReader
+
+from PyQt4.QtCore import (QThread, SIGNAL, QProcess,
+                          QRunnable, QThreadPool, QObject)
 
 
-class QPDFConverter(QThread):
+class QFileCleaner(QRunnable):
 
     """
-    Class for handling conversion of PDF files in separate threads
+    Cleans temp files
     """
 
-    def __init__(self, ifname, ofname, parent=None):
+    def __init__(self, deletions, cls):
 
         """
-        Create instance for conversion
+        Create instance of QFileCleaner with new list
         """
 
-        super(QPDFConverter, self).__init__(parent)
+        QRunnable.__init__(self)
+        self.deletions = deletions
+        self.cls = cls
+        self.q_object = QObject()
+
+    def run(self):
+
+        """
+        Tasks to complete in a separate thread
+        """
+
+        for fname in self.deletions:
+            os.remove(fname)
+        try:
+            self.cls.gui.pushButton.setEnabled(True)
+        except AttributeError:
+            pass
+
+
+class QFileWorker(QObject):
+
+    def __init__(self, deletions, cls):
+        """init attribs"""
+        QObject.__init__(self)
+
+        self.deletions = deletions
+        self.threadpool = QThreadPool()
+        self.cls = cls
+        self._start()
+
+    def _start(self):
+        deleter = QFileCleaner(self.deletions, self.cls)
+        self.threadpool.start(deleter)
+        self.threadpool.waitForDone()
+
+
+
+
+class QRunner(QRunnable):
+
+    """
+    Only QRunnable objects can be used with the QThreadPool
+    therefore we need to do the whole song and dance with
+    creating QRunnables, connecting signals and other such nonsense.
+    """
+
+    def __init__(self, ifname, ofname):
+        """
+        This class does the work of moving the files to the executable to
+        process the pdf pages.
+        """
+        QRunnable.__init__(self)
+        self.q_object = QObject()
         self.ofname = ofname
         self.ifname = ifname
         self.gscriptpath = '"' +  os.getcwd() + r'\gs\gs9.02\bin'
-        self.completed = False
-
 
     def run(self):
 
@@ -37,7 +90,8 @@ class QPDFConverter(QThread):
         """
 
         self.process_file()
-        self.emit(SIGNAL("finished(bool)"), self.completed)
+        self.q_object.emit(SIGNAL("finished()"))
+
 
     def process_file(self):
 
@@ -64,110 +118,73 @@ class QPDFConverter(QThread):
         process.waitForFinished(-1)
 
 
-class FileCleaner(QThread):
+class QWorker(QObject):
 
     """
-    Cleans temp files
+    Starts the QRunnable in a QThreadPool,  inherits QObject because
+    we need to connect signals from the objects we are creating to
+    the functions that update the UI
     """
 
-    def __init__(self, deletions, cls, parent=None):
+    def __init__(self):
+        """init attribs"""
+        QObject.__init__(self)
+        self.threadpool = QThreadPool()
 
-        """
-        Create instance of FileCleaner with new list
-        """
+    def create_job(self, ifname, ofname, cls):
+        runner = QRunner(ifname, ofname)
+        self.connect(runner.q_object, SIGNAL(
+                                         "finished()"), cls.update_progress_bar)
+        self.threadpool.start(runner)
 
-        super(FileCleaner, self).__init__(parent)
-        self.deletions = deletions
+
+class QThreadHandle(QRunnable):
+
+    def __init__(self, pdf, cls):
+        QRunnable.__init__(self)
+        self.pdf = pdf
         self.cls = cls
+        self.work = QWorker()
+        self.work.threadpool.setMaxThreadCount(5)
 
     def run(self):
 
-        """
-        Tasks to complete in a separate thread
-        """
 
-        time.sleep(3)
-        for fname in self.deletions:
-            os.remove(fname)
-        try:
-            self.cls.gui.pushButton.setEnabled(True)
-        except AttributeError:
-            pass
-        self.cleanup()
+        for i in xrange(self.pdf.numPages):
 
-    def cleanup(self):
-        self.exit()
+            output = PdfFileWriter()  # output init
+            output.addPage(self.pdf.getPage(i)) # get page index from orignal
 
-class ThreadHandler(QThread):
 
-    """
-    Supposed to be handling starting and stopping of threads
-    """
+            # append file name of the pdf to the list, so we can tidy up
+            self.cls.deletions.append(
+                        str(self.cls.single_output_dir +
+                        "\page%s.pdf" % i).replace('/', '\\'))
 
-    def __init__(self, parent=None):
-        super(ThreadHandler, self).__init__(parent)
-        self.new_threads = []
-        self.active_threads = []
-        self.running = False
+            # create the output PDF file handle
+            output_stream = open(
+                           self.cls.single_output_dir + "\page%s.pdf" % i, "wb")
 
-    def add_thread(self, thread, cls):
 
-        """
-        Add a new thread to the unactive queue
-        """
+            # Write the data to the stream and close
+            output.write(output_stream)
+            output_stream.close()
 
-        self.connect(thread, SIGNAL("finished(bool)"),
-                     cls.update_progress_bar)
-        self.new_threads.append(thread)
 
-    def run(self):
+            # Send the newly created PDF to the TIF converter.
+            # Concatenates file names surrounding in quotes for CLI
+            # interface to the converter.
+            # Take time to expand this so you can see the filenames form.
 
-        """
-        Method to execute magic in separate threads
-        """
+            self.work.create_job(
+                        '"'  + str(
+                        self.cls.single_output_dir +
+                        "\\page%s.pdf" % i +
+                        '"' ).replace('/', '\\'),     # WTF IS THIS SHIT
 
-        if not self.running:   # if we get called whilst we're running, no go!
-            self.running = True    # We've started
+                        str('"' +
+                        self.cls.single_output_dir +
+                        "\\page%s.tif" % i +
+                        '"').replace('/', '\\'), self.cls)   # WTF IS THIS SHIT
 
-            while self.running:
-                try:
-                    for i in range(len(self.new_threads)): # count threads and
-                                                           # go for that long
 
-                        # append a thread to the active list
-                        self.active_threads.append(self.new_threads[i])
-
-                        # start said thread
-                        self.active_threads[i].start()
-
-                    # wait until all threads in queue have finished.
-                    while not self.threadcheck(i):
-                        pass
-
-                # if we go too far, we've ended the queue
-                finally:
-                    self.running = False
-
-    def threadcheck(self, index):
-
-        """
-        Queries threads to see if they're active
-        if all have ended, return true. Else false
-        """
-
-        # loop through active threads
-        for _thread in self.active_threads:
-
-            # check if threads in queue have finished
-            if not _thread.isFinished():
-                return False
-
-        # if the current index is at the end, we can stop adding threads
-        if index == len(self.active_threads):
-            self.running = False
-        return True
-
-    def cleanup(self):
-        for _thread in self.active_threads:
-            _thread.exit()
-            _thread.wait()
