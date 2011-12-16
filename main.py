@@ -1,11 +1,7 @@
+
 """
 
-Main Module for converting PDF files to tiff files en masse
-
-Consider breaking out into different modules, all this one really needs to do
-is construct the GUI class. Everything can be imported to save on readability
-and code portability. Multithreading in particular has a class that could
-be beneficial elsewhere.
+Module contains GUI thread and GUI slots
 
 """
 
@@ -41,7 +37,6 @@ class MainWindow(QtGui.QMainWindow):
         self.gscriptpath = '"' +  os.getcwd() + r'\gs\gs9.02\bin'
         self.gui.progressBar.hide()
         self.single_output_dir = ''
-        self.threads = []
         self.deletions = []
         self.work = QThreadPool()
         self.work.setMaxThreadCount(1)
@@ -71,10 +66,13 @@ class MainWindow(QtGui.QMainWindow):
         """
         Spawns a find file dialog
         """
-
+        # get a local ref to dialog
         dir_dialog = QtGui.QFileDialog(self)
+        # set dialog type
         dir_dialog.setFileMode(QtGui.QFileDialog.Directory)
 
+        # if the dialog is 'executed' (hit ok)
+        # then we take the string into a class attrib
         if dir_dialog.exec_() == True:
             for item in dir_dialog.selectedFiles():
                 self.single_output_dir = item
@@ -93,7 +91,6 @@ class MainWindow(QtGui.QMainWindow):
         # We set the file type to PDF and only PDF
         self.gui.single_line_in.setText(QtGui.QFileDialog.getOpenFileName(
                                        self, 'Open', '' ,('PDF Files (*.pdf)')))
-
 
     def update_progress_bar(self):
 
@@ -132,12 +129,18 @@ class MainWindow(QtGui.QMainWindow):
         """
         Implementation of multithreaded processing
         """
-        self.gui.btn_single_convert.setEnabled(False) # disable button
-        self.gui.progressBar.setValue(0) # re-init progress bar
-
 
         # Open the PDF that we found in the dialog
-        pdf = PdfFileReader(open(self.gui.single_line_in.text(), 'rb'))
+        try:
+            pdf = PdfFileReader(open(self.gui.single_line_in.text(), 'rb'))
+
+        # if the file cannot be properly read raise error
+        except AssertionError:
+            QtGui.QMessageBox.warning(self, "Error", "This file is corrupt")
+            return
+
+        self.gui.btn_single_convert.setEnabled(False) # disable button
+        self.gui.progressBar.setValue(0) # re-init progress bar
 
         # Show the progress bar
         self.gui.progressBar.show()
@@ -163,10 +166,7 @@ class MainWindow(QtGui.QMainWindow):
         pass
 
 
-
-
 if __name__ == "__main__":
-
 
     APPLICATION = QtGui.QApplication(sys.argv)
     MAINWINDOW = MainWindow()

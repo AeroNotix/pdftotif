@@ -1,15 +1,18 @@
 """
 
-This module deals purely with multithreading
+This module implements the major multithreading for
+converting PDF to TIFF files
 
-Beyond here, be dragons. Arm yourself.
+The only real thing you need to directly call is the QThreadHandle
+and QFileWorker
+
+The naming convention could do with some changes as really, QThreadHandle
+does not accurately describe what we're doing here.
 
 """
 import os
-import time
 
 from pyPdf import PdfFileWriter, PdfFileReader
-
 from PyQt4.QtCore import (QThread, SIGNAL, QProcess,
                           QRunnable, QThreadPool, QObject)
 
@@ -81,7 +84,7 @@ class QRunner(QRunnable):
 
         This class should not be called directly as it is a QRunnable object
         therefore we need a QThreadPool object to start/stop and monitor
-        progress
+        progress.
 
         The worker is QWorker and will create these instances for us.
         """
@@ -193,12 +196,11 @@ class QThreadHandle(QRunnable):
     def __init__(self, pdf, cls):
 
         """
-        This is the only class that gets called from the main thread
+        This is the only class that gets called from the main thread.
 
         It is called when we wish to split a PDF document and when we
         want to start a new batch of threads for image processing
-
-        This class is a thread of it's own, controlling other threads
+        This class is a thread of it's own, controlling other threads.
 
         I believe this is a good method as it behaves as below:
 
@@ -221,7 +223,7 @@ class QThreadHandle(QRunnable):
 
         # create QWorker object
         self.work = QWorker()
-        self.work.threadpool.setMaxThreadCount(5)
+        self.work.threadpool.setMaxThreadCount(10)
 
     def run(self):
 
