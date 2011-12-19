@@ -16,6 +16,8 @@ from PyQt4.QtCore import QThreadPool
 from pyPdf import PdfFileReader
 
 from scanning_qthread.ui.main_UI import Ui_MainWindow
+from scanning_qthread.ui import about
+from scanning_qthread.ui import options
 from scanning_qthread.mthreading.mthreading import QFileWorker, QThreadHandle
 
 #---------------------------GUI Class-------------------------------------------
@@ -40,6 +42,10 @@ class MainWindow(QtGui.QMainWindow):
         self.deletions = []
         self.work = QThreadPool()
         self.work.setMaxThreadCount(1)
+        self.thread_number = 5
+
+    def debug(self, num):
+        print 'called with {0} threads'.format(num)
 
     def quit(self):
 
@@ -165,6 +171,14 @@ class MainWindow(QtGui.QMainWindow):
         """
         pass
 
+    def spawn_options(self):
+
+        options.OptionsDialog(self).exec_()
+
+
+    def spawn_about(self):
+
+        about.AboutDialog(self).exec_()
 
 if __name__ == "__main__":
 

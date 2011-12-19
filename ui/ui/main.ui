@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>362</width>
-    <height>203</height>
+    <height>206</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -139,24 +139,24 @@
      <x>0</x>
      <y>0</y>
      <width>362</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>&amp;File</string>
     </property>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string>E&amp;dit</string>
     </property>
     <addaction name="actionOptions"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="actionAbout"/>
    </widget>
@@ -177,13 +177,22 @@
   </action>
   <action name="actionAbout">
    <property name="text">
-    <string>About...</string>
+    <string>&amp;About...</string>
    </property>
   </action>
  </widget>
  <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>single_line_in</tabstop>
+  <tabstop>btn_single_file</tabstop>
+  <tabstop>single_line_out</tabstop>
+  <tabstop>bt_output_single</tabstop>
+  <tabstop>btn_single_convert</tabstop>
   <tabstop>lineEdit</tabstop>
   <tabstop>btn_dir_lookup</tabstop>
+  <tabstop>lineEdit_2</tabstop>
+  <tabstop>btn_output_dir</tabstop>
+  <tabstop>btn_dir_convert</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -226,8 +235,8 @@
    <slot>dir_locate()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>289</x>
-     <y>78</y>
+     <x>102</x>
+     <y>60</y>
     </hint>
     <hint type="destinationlabel">
      <x>361</x>
@@ -242,8 +251,8 @@
    <slot>dir_output()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>289</x>
-     <y>104</y>
+     <x>102</x>
+     <y>66</y>
     </hint>
     <hint type="destinationlabel">
      <x>361</x>
@@ -274,8 +283,8 @@
    <slot>convert_dir()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>322</x>
-     <y>126</y>
+     <x>102</x>
+     <y>72</y>
     </hint>
     <hint type="destinationlabel">
      <x>824</x>

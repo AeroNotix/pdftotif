@@ -163,9 +163,9 @@ class QWorker(QObject):
 
         # init QObject
         QObject.__init__(self)
-
         # Our own threadpool, for adding QRunners
         self.threadpool = QThreadPool()
+        self.jobs = []
 
     def create_job(self, ifname, ofname, cls):
 
@@ -223,7 +223,11 @@ class QThreadHandle(QRunnable):
 
         # create QWorker object
         self.work = QWorker()
-        self.work.threadpool.setMaxThreadCount(10)
+        try:
+            self.work.threadpool.setMaxThreadCount(self.cls.thread_number)
+            self.cls.debug(self.cls.thread_number)
+        except AttributeError:
+            self.work.threadpool.setMaxThreadCount(5)
 
     def run(self):
 
@@ -264,5 +268,6 @@ class QThreadHandle(QRunnable):
                         self.cls.single_output_dir +
                         "\\page%s.tif" % i +
                         '"').replace('/', '\\'), self.cls)   # WTF IS THIS SHIT
+
 
 

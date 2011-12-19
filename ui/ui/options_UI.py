@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'about.ui'
+# Form implementation generated from reading ui file 'options.ui'
 #
-# Created: Fri Dec 16 15:53:33 2011
-#      by: PyQt4 UI code generator 4.8.4
+# Created: Sat Dec 17 13:23:09 2011
+#      by: PyQt4 UI code generator 4.8.5
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -16,17 +16,26 @@ except AttributeError:
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
-        Dialog.setObjectName(_fromUtf8("Dialog"))
-        Dialog.resize(312, 261)
+        Dialog.setObjectName(_fromUtf8("Options"))
+        Dialog.setWindowTitle(QtGui.QApplication.translate("Options", "Options", None, QtGui.QApplication.UnicodeUTF8))
         self.gridLayout = QtGui.QGridLayout(Dialog)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.buttonBox = QtGui.QDialogButtonBox(Dialog)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
-        self.gridLayout.addWidget(self.buttonBox, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.buttonBox, 2, 1, 1, 1)
+        self.label = QtGui.QLabel(Dialog)
+        self.label.setText(QtGui.QApplication.translate("Dialog", "Number of threads", None, QtGui.QApplication.UnicodeUTF8))
+        self.label.setObjectName(_fromUtf8("label"))
+        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
         spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.gridLayout.addItem(spacerItem, 0, 0, 1, 1)
+        self.gridLayout.addItem(spacerItem, 1, 1, 1, 1)
+        self.spinBox = QtGui.QSpinBox(Dialog)
+        self.spinBox.setMinimum(1)
+        self.spinBox.setMaximum(15)
+        self.spinBox.setObjectName(_fromUtf8("spinBox"))
+        self.gridLayout.addWidget(self.spinBox, 0, 1, 1, 1)
 
         self.retranslateUi(Dialog)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
@@ -34,5 +43,5 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "Dialog", None, QtGui.QApplication.UnicodeUTF8))
+        pass
 
