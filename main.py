@@ -19,6 +19,7 @@ from scanning_qthread.ui.main_UI import Ui_MainWindow
 from scanning_qthread.ui import about
 from scanning_qthread.ui import options
 from scanning_qthread.mthreading.mthreading import QFileWorker, QThreadHandle
+from scanning_qthread.ui.ui.resources import qrc_resources
 
 #---------------------------GUI Class-------------------------------------------
 
@@ -43,6 +44,7 @@ class MainWindow(QtGui.QMainWindow):
         self.work = QThreadPool()
         self.work.setMaxThreadCount(1)
         self.thread_number = 5
+        self.setWindowIcon(QtGui.QIcon(":/ico.png"))
 
     def debug(self, num):
         print 'called with {0} threads'.format(num)
@@ -177,8 +179,9 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def spawn_about(self):
-
-        about.AboutDialog(self).exec_()
+        about_dialog  = about.AboutDialog(self)
+        about_dialog.gui.label_2.setPixmap(QtGui.QPixmap(":/about.png"))
+        about_dialog.exec_()
 
 if __name__ == "__main__":
 
