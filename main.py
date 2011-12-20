@@ -21,6 +21,8 @@ from scanning_qthread.ui import options
 from scanning_qthread.mthreading.mthreading import QFileWorker, QThreadHandle
 from scanning_qthread.ui.ui.resources import qrc_resources
 
+qrc_resources.qInitResources()
+
 #---------------------------GUI Class-------------------------------------------
 
 class MainWindow(QtGui.QMainWindow):
@@ -45,9 +47,6 @@ class MainWindow(QtGui.QMainWindow):
         self.work.setMaxThreadCount(1)
         self.thread_number = 5
         self.setWindowIcon(QtGui.QIcon(":/ico.png"))
-
-    def debug(self, num):
-        print 'called with {0} threads'.format(num)
 
     def quit(self):
 
@@ -183,11 +182,17 @@ class MainWindow(QtGui.QMainWindow):
         pass
 
     def spawn_options(self):
+        """
+        Spawns an options dialog
+        """
 
         options.OptionsDialog(self).exec_()
 
 
     def spawn_about(self):
+        """
+        Spawns an options dialog
+        """
         about_dialog  = about.AboutDialog(self)
         about_dialog.gui.label_2.setPixmap(QtGui.QPixmap(":/about.png"))
         about_dialog.exec_()
