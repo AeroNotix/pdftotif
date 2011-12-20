@@ -15,7 +15,7 @@ from PyQt4.QtCore import QThreadPool
 
 from pyPdf import PdfFileReader
 
-from scanning_qthread.ui.main_UI import Ui_MainWindow
+from scanning_qthread.ui.ui.main_UI import Ui_MainWindow
 from scanning_qthread.ui import about
 from scanning_qthread.ui import options
 from scanning_qthread.mthreading.mthreading import QFileWorker, QThreadHandle
@@ -138,13 +138,22 @@ class MainWindow(QtGui.QMainWindow):
         Implementation of multithreaded processing
         """
 
+        # if they click convert without looking for files
+        if len(self.gui.single_line_in.text()) < 1:
+            return
+        if len(self.gui.single_line_out.text()) < 1:
+            return
+
         # Open the PDF that we found in the dialog
         try:
             pdf = PdfFileReader(open(self.gui.single_line_in.text(), 'rb'))
-
         # if the file cannot be properly read raise error
         except AssertionError:
             QtGui.QMessageBox.warning(self, "Error", "This file is corrupt")
+            return
+        # if the file does not exist
+        except IOError:
+            QtGui.QMessageBox.warning(self, "Error", "Not a valid file path")
             return
 
         self.gui.btn_single_convert.setEnabled(False) # disable button
