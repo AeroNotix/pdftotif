@@ -76,7 +76,7 @@ class QRunner(QRunnable):
     creating QRunnables, connecting signals and other such nonsense.
     """
 
-    def __init__(self, ifname, ofname):
+    def __init__(self, ifname, ofname, res):
 
         """
         This class does the work of moving the files to the executable to
@@ -98,6 +98,7 @@ class QRunner(QRunnable):
         # take the inputs
         self.ofname = ofname
         self.ifname = ifname
+        self.res = res
 
         # gs exe
         self.gscriptpath = '"' +  os.getcwd() + r'\gs\gs9.02\bin'
@@ -127,7 +128,7 @@ class QRunner(QRunnable):
                            '-q',
                            '-dNOPAUSE',
                            '-dBATCH',
-                           '-r900',            # resolution
+                           '-r{0}x{0}'.format(self.res),            # resolution
                            '-sDEVICE=tiffg4',  # container type, see gs docs
                            '-sPAPERSIZE=a4',   # page size
                            '-sOutputFile=%s %s' % (str(self.ofname),
@@ -179,7 +180,7 @@ class QWorker(QObject):
         """
 
         # Create the QRunner object and pass it filenames
-        runner = QRunner(ifname, ofname)
+        runner = QRunner(ifname, ofname, cls.resolution)
 
         # using our own connect method inherited from QObject
         # connect the QRunner created before and use it's QObject
@@ -223,6 +224,7 @@ class QThreadHandle(QRunnable):
 
         # create QWorker object
         self.work = QWorker()
+
         try:
             self.work.threadpool.setMaxThreadCount(self.cls.thread_number)
             self.cls.debug(self.cls.thread_number)

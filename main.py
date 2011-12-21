@@ -47,6 +47,7 @@ class MainWindow(QtGui.QMainWindow):
         self.work.setMaxThreadCount(1)
         self.thread_number = 5
         self.setWindowIcon(QtGui.QIcon(":/ico.png"))
+        self.resolution = 450
 
     def quit(self):
 
@@ -193,6 +194,7 @@ class MainWindow(QtGui.QMainWindow):
         """
         Spawns an options dialog
         """
+
         about_dialog  = about.AboutDialog(self)
         about_dialog.gui.label_2.setPixmap(QtGui.QPixmap(":/about.png"))
         about_dialog.exec_()
