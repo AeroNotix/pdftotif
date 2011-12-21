@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'options.ui'
 #
-# Created: Wed Dec 21 12:17:56 2011
+# Created: Wed Dec 21 12:32:11 2011
 #      by: PyQt4 UI code generator 4.8.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -73,7 +73,7 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "Dialog", None, QtGui.QApplication.UnicodeUTF8))
+        Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "Options", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("Dialog", "Number of threads", None, QtGui.QApplication.UnicodeUTF8))
         self.cmb_Quality.setItemText(0, QtGui.QApplication.translate("Dialog", "Very Low Quality", None, QtGui.QApplication.UnicodeUTF8))
         self.cmb_Quality.setItemText(1, QtGui.QApplication.translate("Dialog", "Low Quality", None, QtGui.QApplication.UnicodeUTF8))
