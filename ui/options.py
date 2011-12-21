@@ -27,6 +27,7 @@ class OptionsDialog(QtGui.QDialog):
         self.gui = Ui_Dialog()
         self.gui.setupUi(self)
 
+        # set the thread value to the value used on the parent
         try:
             self.gui.spin_Threads.setValue(self.parent.thread_number)
         except AttributeError:
@@ -67,7 +68,7 @@ class OptionsDialog(QtGui.QDialog):
         except AttributeError:
             pass
 
-
+#----------------------------------SLOTS----------------------------------------
     def accept(self):
 
         """
@@ -75,7 +76,7 @@ class OptionsDialog(QtGui.QDialog):
         """
 
         try:
-            self.parent.thread_number = self.gui.spinBox.value()
+            self.parent.thread_number = self.gui.spin_Threads.value()
         except AttributeError:
             pass
 
@@ -92,6 +93,9 @@ class OptionsDialog(QtGui.QDialog):
             pass
 
     def mode_changed(self, mode):
+        """
+        Changes the mode on the parent
+        """
 
         try:
             self.parent.mode = str(mode)
@@ -109,10 +113,6 @@ class OptionsDialog(QtGui.QDialog):
         self.gui.spin_Threads.setValue(5)
 
 if __name__ == "__main__":
-
-    """
-    In module testing
-    """
 
     APPLICATION = QtGui.QApplication(sys.argv)
     MAINWINDOW = OptionsDialog()

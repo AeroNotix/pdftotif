@@ -50,6 +50,7 @@ class MainWindow(QtGui.QMainWindow):
         self.resolution = 450
         self.mode = 'tiffg4'
 
+
     def quit(self):
 
         """
@@ -58,17 +59,20 @@ class MainWindow(QtGui.QMainWindow):
 
         print self
 
+
     def dir_locate(self):
         """
         Will locate a dir to split all pdfs
         """
         pass
 
+
     def dir_output(self):
         """
         Will locate an output dir for dir conversion
         """
         pass
+
 
     def single_output_file(self):
 
@@ -89,7 +93,6 @@ class MainWindow(QtGui.QMainWindow):
                 break
 
 
-
     def single_locate_file(self):
 
         """
@@ -100,6 +103,7 @@ class MainWindow(QtGui.QMainWindow):
         # We set the file type to PDF and only PDF
         self.gui.single_line_in.setText(QtGui.QFileDialog.getOpenFileName(
                                        self, 'Open', '' ,('PDF Files (*.pdf)')))
+
 
     def update_progress_bar(self):
 
@@ -183,6 +187,7 @@ class MainWindow(QtGui.QMainWindow):
         """
         pass
 
+
     def spawn_options(self):
         """
         Spawns an options dialog
@@ -199,6 +204,7 @@ class MainWindow(QtGui.QMainWindow):
         about_dialog  = about.AboutDialog(self)
         about_dialog.gui.label_2.setPixmap(QtGui.QPixmap(":/about.png"))
         about_dialog.exec_()
+
 
 if __name__ == "__main__":
 
