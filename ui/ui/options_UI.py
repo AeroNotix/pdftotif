@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'options.ui'
 #
-# Created: Wed Dec 21 12:14:00 2011
+# Created: Wed Dec 21 12:17:56 2011
 #      by: PyQt4 UI code generator 4.8.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -69,6 +69,7 @@ class Ui_Dialog(object):
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), Dialog.reject)
         QtCore.QObject.connect(self.cmb_Quality, QtCore.SIGNAL(_fromUtf8("currentIndexChanged(QString)")), Dialog.quality_change)
         QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL(_fromUtf8("clicked()")), Dialog.set_defaults)
+        QtCore.QObject.connect(self.cmb_Mode, QtCore.SIGNAL(_fromUtf8("currentIndexChanged(QString)")), Dialog.mode_changed)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):

@@ -48,6 +48,7 @@ class MainWindow(QtGui.QMainWindow):
         self.thread_number = 5
         self.setWindowIcon(QtGui.QIcon(":/ico.png"))
         self.resolution = 450
+        self.mode = 'tiffg4'
 
     def quit(self):
 

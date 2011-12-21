@@ -28,9 +28,19 @@ class OptionsDialog(QtGui.QDialog):
         self.gui.setupUi(self)
 
         try:
-            self.gui.spinBox.setValue(self.parent.thread_number)
+            self.gui.spin_Threads.setValue(self.parent.thread_number)
         except AttributeError:
             pass
+
+        # create a map to return previous values to the dialog
+        self.mode_dict = {'tiffcrle': 0,
+                          'tiffg3': 1,
+                          'tiffg4': 2,
+                          'tifflzw': 3,
+                          'tiffpack': 4}
+
+        # set previous values on dialog
+        self.gui.cmb_Mode.setCurrentIndex(self.mode_dict[self.parent.mode])
 
 
         # since we set the resolution from the dict last time
@@ -52,7 +62,7 @@ class OptionsDialog(QtGui.QDialog):
 
         # apply value from dict
         try:
-            self.gui.comboBox.setCurrentIndex(
+            self.gui.cmb_Quality.setCurrentIndex(
                                     self.previous_index[self.parent.resolution])
         except AttributeError:
             pass
@@ -81,7 +91,18 @@ class OptionsDialog(QtGui.QDialog):
         except AttributeError:
             pass
 
+    def mode_changed(self, mode):
+
+        try:
+            self.parent.mode = str(mode)
+        except AttributeError:
+            pass
+
     def set_defaults(self):
+
+        """
+        Set defaults back to what they were
+        """
 
         self.gui.cmb_Mode.setCurrentIndex(2)
         self.gui.cmb_Quality.setCurrentIndex(2)

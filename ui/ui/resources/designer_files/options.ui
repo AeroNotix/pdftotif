@@ -210,9 +210,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cmb_Mode</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>Dialog</receiver>
+   <slot>mode_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>141</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>734</x>
+     <y>658</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>quality_change()</slot>
   <slot>set_defaults()</slot>
+  <slot>mode_changed()</slot>
  </slots>
 </ui>
