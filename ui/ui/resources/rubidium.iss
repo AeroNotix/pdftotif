@@ -5,15 +5,15 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{B72FF94A-92D6-48FD-A803-908BA3BC8288}
+AppId={{711E0E4B-A8AC-4C0A-B70A-9BBBD98ED136}
 AppName=Rubidium
-AppVersion=1.0
-;AppVerName=Rubidium 1.0
+AppVersion=1.1
+;AppVerName=Rubidium 1.1
 AppPublisher=HP
 DefaultDirName={pf}\Rubidium
 DefaultGroupName=Rubidium
 OutputDir=C:\Documents and Settings\francea\Desktop
-OutputBaseFilename=rubidium-1.0-setup
+OutputBaseFilename=rubidium-1.1-setup
 SetupIconFile=C:\Documents and Settings\francea\Desktop\scanning_qthread\ui\ui\resources\icon.ico
 Compression=lzma
 SolidCompression=yes

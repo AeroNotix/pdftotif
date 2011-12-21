@@ -1,3 +1,8 @@
+"""
+Module for pulling the options_UI dialog form into it's own class
+so we can just import that and not all the UI elements
+"""
+
 import sys
 
 from PyQt4 import QtGui
@@ -76,6 +81,11 @@ class OptionsDialog(QtGui.QDialog):
         except AttributeError:
             pass
 
+    def set_defaults(self):
+
+        self.gui.cmb_Mode.setCurrentIndex(2)
+        self.gui.cmb_Quality.setCurrentIndex(2)
+        self.gui.spin_Threads.setValue(5)
 
 if __name__ == "__main__":
 
