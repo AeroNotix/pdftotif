@@ -1,0 +1,6 @@
+<RCC>
+  <qresource>
+    <file alias="ico.png">ico.png</file>
+    <file alias="about.png">pdftotif_small.png</file>
+  </qresource>
+</RCC>

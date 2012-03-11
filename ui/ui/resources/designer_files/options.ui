@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>288</width>
+    <height>145</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Options</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Number of threads</string>
+     </property>
+     <property name="buddy">
+      <cstring>spin_Threads</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QSpinBox" name="spin_Threads">
+     <property name="maximum">
+      <number>15</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="cmb_Quality">
+     <property name="currentIndex">
+      <number>2</number>
+     </property>
+     <item>
+      <property name="text">
+       <string>Very Low Quality</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Low Quality</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Medium Quality</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>High Quality</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Very High Quality</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Quality</string>
+     </property>
+     <property name="buddy">
+      <cstring>cmb_Quality</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Mode</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QComboBox" name="cmb_Mode">
+     <property name="currentIndex">
+      <number>2</number>
+     </property>
+     <item>
+      <property name="text">
+       <string>tiffcrle</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>tiffg3</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>tiffg4</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>tifflzw</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>tiffpack</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="1">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QPushButton" name="pushButton">
+     <property name="text">
+      <string>Defaults</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>Dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>278</x>
+     <y>135</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>112</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>Dialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>278</x>
+     <y>135</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>269</x>
+     <y>112</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmb_Quality</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>Dialog</receiver>
+   <slot>quality_change()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>196</x>
+     <y>42</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>287</x>
+     <y>144</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>set_defaults()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>75</x>
+     <y>123</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>860</x>
+     <y>546</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmb_Mode</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>Dialog</receiver>
+   <slot>mode_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>141</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>734</x>
+     <y>658</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>quality_change()</slot>
+  <slot>set_defaults()</slot>
+  <slot>mode_changed()</slot>
+ </slots>
+</ui>
